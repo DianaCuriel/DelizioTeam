@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'chat.dart'; // Asegúrate de que este archivo contiene ChatApp
 
 class ConversationsList extends StatefulWidget {
-  const ConversationsList({Key? key}) : super(key: key);
+  const ConversationsList({super.key});
 
   @override
   _ConversationsListState createState() => _ConversationsListState();

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ChatApp extends StatelessWidget {
   final String origen;
 
-  const ChatApp({Key? key, required this.origen}) : super(key: key);
+  const ChatApp({super.key, required this.origen});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class ChatApp extends StatelessWidget {
 class ChatPage extends StatefulWidget {
   final String origen;
 
-  const ChatPage({Key? key, required this.origen}) : super(key: key);
+  const ChatPage({super.key, required this.origen});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
