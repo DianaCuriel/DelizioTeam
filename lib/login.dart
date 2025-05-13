@@ -19,7 +19,7 @@ class LoginScreenState extends State<LoginScreen> {
     String email = _emailController.text;
     String password = _passwordController.text;
 
-    if (email == "admin" && password == "123") {
+    if (email == "admin" && password == "1234") {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
@@ -53,7 +53,7 @@ class LoginScreenState extends State<LoginScreen> {
             right: 0,
             child: Column(
               children: [
-                Image.asset('lib/Config/Imagenes/Icon.jpg', height: 100),
+                Image.asset('lib/Config/Imagenes/Logo.png', height: 100),
                 SizedBox(height: 10),
                 Text(
                   "DELIZIO",
@@ -201,7 +201,9 @@ class LoginScreenState extends State<LoginScreen> {
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
-        floatingLabelStyle: TextStyle(color: Colors.lightBlueAccent),
+        floatingLabelStyle: TextStyle(
+          color: const Color.fromRGBO(64, 196, 255, 1),
+        ),
       ),
     );
   }

@@ -13,7 +13,7 @@ class PedidoProvider with ChangeNotifier {
       cantidad: 1,
       salsas: 'Verde',
       descripcion: 'Enchiladas con pollo, crema y queso',
-      imagen: 'assets/enchiladas.jpg',
+      imagen: 'lib/Config/Imagenes/enchiladas.jpg',
       estado: 'Pendientes',
     ),
     Pedido(
@@ -26,7 +26,7 @@ class PedidoProvider with ChangeNotifier {
       cantidad: 3,
       salsas: 'Roja y Verde',
       descripcion: 'Tacos con piña y cebolla',
-      imagen: 'assets/tacos.jpg',
+      imagen: 'lib/Config/Imagenes/Tacos del pastor.jpg',
       estado: 'En proceso',
     ),
     Pedido(
@@ -39,7 +39,7 @@ class PedidoProvider with ChangeNotifier {
       cantidad: 2,
       salsas: 'Ninguna',
       descripcion: 'Pechuga de pollo con mole y arroz',
-      imagen: 'assets/mole.jpg',
+      imagen: 'lib/Config/Imagenes/mole poblano.jpg',
       estado: 'Entregados',
     ),
   ];

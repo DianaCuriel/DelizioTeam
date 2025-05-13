@@ -168,14 +168,16 @@ class _OlvidarContraState extends State<OlvidarContra> {
         fillColor: Colors.grey[200],
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.red), // Borde rojo al enfocar
+          borderSide: BorderSide(
+            color: const Color.fromARGB(255, 64, 196, 255),
+          ), // Borde rojo al enfocar
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
         floatingLabelStyle: TextStyle(
-          color: Colors.red,
+          color: const Color.fromARGB(255, 64, 196, 255),
         ), // Label rojo al enfocar
       ),
     );
