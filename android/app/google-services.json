@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "183591499676",
+    "project_id": "delizio-eedc1",
+    "storage_bucket": "delizio-eedc1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:183591499676:android:0f71e39a227c5336313a59",
+        "android_client_info": {
+          "package_name": "com.example.delizio_para_restaurantes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpqAFDbpaO04UBRgpmDTESmSkxBTT7EAc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:183591499676:android:67ec2c1e009855e6313a59",
+        "android_client_info": {
+          "package_name": "com.example.front_end"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpqAFDbpaO04UBRgpmDTESmSkxBTT7EAc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

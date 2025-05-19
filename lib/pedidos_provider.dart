@@ -1,65 +1,83 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'pedido_modelo.dart';
 
 class PedidoProvider with ChangeNotifier {
-  final List<Pedido> _listaPedidos = [
-    Pedido(
-      id: 1,
-      nombre: 'Ana Gómez',
-      cubiertos: 2,
-      precio: 120.50,
-      tipoPago: 'Tarjeta',
-      nombreplatillo: 'Enchiladas suizas',
-      cantidad: 1,
-      salsas: 'Verde',
-      descripcion: 'Enchiladas con pollo, crema y queso',
-      imagen: 'lib/Config/Imagenes/enchiladas.jpg',
-      estado: 'Pendientes',
-    ),
-    Pedido(
-      id: 2,
-      nombre: 'Carlos Pérez',
-      cubiertos: 1,
-      precio: 85.00,
-      tipoPago: 'Efectivo',
-      nombreplatillo: 'Tacos al pastor',
-      cantidad: 3,
-      salsas: 'Roja y Verde',
-      descripcion: 'Tacos con piña y cebolla',
-      imagen: 'lib/Config/Imagenes/Tacos del pastor.jpg',
-      estado: 'En proceso',
-    ),
-    Pedido(
-      id: 3,
-      nombre: 'Lucía Ramírez',
-      cubiertos: 3,
-      precio: 200.00,
-      tipoPago: 'Tarjeta',
-      nombreplatillo: 'Mole poblano',
-      cantidad: 2,
-      salsas: 'Ninguna',
-      descripcion: 'Pechuga de pollo con mole y arroz',
-      imagen: 'lib/Config/Imagenes/mole poblano.jpg',
-      estado: 'Entregados',
-    ),
-  ];
+  List<Pedido> _pedidos = [];
+  String? _nombreRestaurante;
 
-  List<Pedido> get pedidos => _listaPedidos;
+  List<Pedido> get pedidos => _pedidos;
 
-  List<Pedido> pedidosPorEstado(String estado) {
-    return _listaPedidos.where((p) => p.estado == estado).toList();
+  Future<void> cargarPedidosPorNegocio(String nombreRestaurante) async {
+    _nombreRestaurante = nombreRestaurante;
+    final snapshot = await FirebaseFirestore.instance
+        .collection('compras')
+        .where('NEGOCIO', isEqualTo: nombreRestaurante)
+        .get();
+
+    _pedidos = await _procesarPedidos(snapshot.docs);
+    notifyListeners();
   }
 
-  void cambiarEstado(int id, String nuevoEstado) {
-    final index = _listaPedidos.indexWhere((p) => p.id == id);
+  Future<List<Pedido>> _procesarPedidos(List<QueryDocumentSnapshot> docs) async {
+    List<Pedido> pedidos = [];
+    for (var doc in docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      pedidos.add(Pedido.fromMap(doc.id, data, 'Cliente')); // Nombre temporal
+    }
+    return pedidos;
+  }
+
+  Stream<List<Pedido>> escucharPedidosPorNegocio(String nombreRestaurante) {
+    return FirebaseFirestore.instance
+        .collection('compras')
+        .where('NEGOCIO', isEqualTo: nombreRestaurante)
+        .snapshots()
+        .asyncMap((snapshot) => _procesarPedidos(snapshot.docs));
+  }
+
+  List<Pedido> pedidosPorEstado(String estado) {
+    return _pedidos.where((pedido) => pedido.estado == estado).toList();
+  }
+
+  Future<void> cambiarEstado(String pedidoId, String nuevoEstado) async {
+    await FirebaseFirestore.instance
+        .collection('compras')
+        .doc(pedidoId)
+        .update({'estado': nuevoEstado});
+    
+    final index = _pedidos.indexWhere((p) => p.id == pedidoId);
     if (index != -1) {
-      _listaPedidos[index].estado = nuevoEstado;
+      _pedidos[index] = _pedidos[index].copyWith(estado: nuevoEstado);
       notifyListeners();
     }
   }
 
-  void eliminarPedido(int id) {
-    _listaPedidos.removeWhere((p) => p.id == id);
+  Future<void> eliminarPedido(String pedidoId) async {
+    await FirebaseFirestore.instance.collection('compras').doc(pedidoId).delete();
+    _pedidos.removeWhere((pedido) => pedido.id == pedidoId);
     notifyListeners();
+  }
+}
+
+extension PedidoCopyWith on Pedido {
+  Pedido copyWith({
+    String? estado,
+  }) {
+    return Pedido(
+      id: id,
+      nombreCliente: nombreCliente,
+      productos: productos,
+      mensaje: mensaje,
+      direccion: direccion,
+      estado: estado ?? this.estado,
+      metodoPago: metodoPago,
+      total: total,
+      cubiertos: cubiertos,
+      cantidad: cantidad,
+      nombreplatillo: nombreplatillo,
+      precioUnitario: precioUnitario,
+      subtotal: subtotal,
+    );
   }
 }
