@@ -38,7 +38,7 @@ class _OlvidarContraState extends State<OlvidarContra> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text("OK", style: TextStyle(color: Colors.red)),
+              child: Text("OK", style: TextStyle(color: Colors.lightBlue)),
             ),
           ],
         );
@@ -63,7 +63,7 @@ class _OlvidarContraState extends State<OlvidarContra> {
         title: "Error",
         message: "Las contraseñas no coinciden",
         icon: Icons.error,
-        iconColor: Colors.red,
+        iconColor: Colors.lightBlue,
       );
     } else {
       _showCustomDialog(
@@ -78,12 +78,18 @@ class _OlvidarContraState extends State<OlvidarContra> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Recuperar contraseña'),
+        title: Text(
+          'Recuperar contraseña',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
+        iconTheme: IconThemeData(
+          color: Colors.white,
+        ), // Para íconos como "back"
       ),
+
       body: Center(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(24),
@@ -94,7 +100,7 @@ class _OlvidarContraState extends State<OlvidarContra> {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black12,
+                  color: Colors.blueGrey,
                   blurRadius: 10,
                   offset: Offset(0, 4),
                 ),
@@ -103,7 +109,7 @@ class _OlvidarContraState extends State<OlvidarContra> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(LucideIcons.lock, size: 60, color: Colors.red),
+                Icon(LucideIcons.lock, size: 60, color: Colors.lightBlue),
                 SizedBox(height: 20),
                 _buildTextField(
                   controller: _emailController,

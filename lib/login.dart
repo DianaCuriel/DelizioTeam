@@ -20,9 +20,29 @@ class LoginScreenState extends State<LoginScreen> {
   bool _rememberMe = false;
   bool _isLoading = false;
 
-Future<void> _login() async {
+  @override
+  void initState() {
+    super.initState();
+    _cargarCredencialesGuardadas();
+  }
+
+  Future<void> _cargarCredencialesGuardadas() async {
+    final prefs = await SharedPreferences.getInstance();
+    final rememberMe = prefs.getBool('remember_me') ?? false;
+
+    if (rememberMe) {
+      setState(() {
+        _rememberMe = true;
+        _emailController.text = prefs.getString('email') ?? '';
+        _passwordController.text = prefs.getString('password') ?? '';
+        _restauranteController.text = prefs.getString('restaurante') ?? '';
+      });
+    }
+  }
+
+  Future<void> _login() async {
     setState(() => _isLoading = true);
-    
+
     try {
       final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
@@ -35,31 +55,36 @@ Future<void> _login() async {
       final userId = userCredential.user!.uid;
 
       // 2. Verificar datos en colección USUARIOS
-      final userDoc = await FirebaseFirestore.instance
-          .collection('USUARIOS')
-          .doc(userId)
-          .get();
+      final userDoc =
+          await FirebaseFirestore.instance
+              .collection('USUARIOS')
+              .doc(userId)
+              .get();
 
       if (!userDoc.exists) {
         throw Exception('Usuario no registrado en el sistema');
       }
 
       final userData = userDoc.data() as Map<String, dynamic>;
-      final tipoUsuario = userData['TIPOUSUARIO']?.toString().toLowerCase() ?? '';
+      final tipoUsuario =
+          userData['TIPOUSUARIO']?.toString().toLowerCase() ?? '';
       final negocioUsuario = userData['NEGOCIO']?.toString().trim() ?? '';
 
       // 3. Verificar que el restaurante exista
-      final restaurantesQuery = await FirebaseFirestore.instance
-          .collection('restaurantes')
-          .where('NEGOCIO', isEqualTo: restauranteIngresado)
-          .limit(1)
-          .get();
+      final restaurantesQuery =
+          await FirebaseFirestore.instance
+              .collection('restaurantes')
+              .where('NEGOCIO', isEqualTo: restauranteIngresado)
+              .limit(1)
+              .get();
 
       if (restaurantesQuery.docs.isEmpty) {
         throw Exception('Restaurante no encontrado en nuestros registros');
       }
 
-      final nombreRestaurante = restaurantesQuery.docs.first.data()['NEGOCIO']?.toString().trim() ?? '';
+      final nombreRestaurante =
+          restaurantesQuery.docs.first.data()['NEGOCIO']?.toString().trim() ??
+          '';
 
       // 4. Validar acceso según tipo de usuario
       if (tipoUsuario == 'administrador') {
@@ -75,14 +100,15 @@ Future<void> _login() async {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomeScreen(
-              nombreRestaurante: nombreRestaurante,
-              tipoUsuario: tipoUsuario,
-            ),
+            builder:
+                (context) => HomeScreen(
+                  nombreRestaurante: nombreRestaurante,
+                  tipoUsuario: tipoUsuario,
+                ),
           ),
         );
-      } 
-      else if (tipoUsuario == 'locatario' && negocioUsuario.toLowerCase() == nombreRestaurante.toLowerCase()) {
+      } else if (tipoUsuario == 'locatario' &&
+          negocioUsuario.toLowerCase() == nombreRestaurante.toLowerCase()) {
         // Locatarios solo pueden acceder a su restaurante asignado
         if (_rememberMe) {
           final prefs = await SharedPreferences.getInstance();
@@ -95,17 +121,16 @@ Future<void> _login() async {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomeScreen(
-              nombreRestaurante: nombreRestaurante,
-              tipoUsuario: tipoUsuario,
-            ),
+            builder:
+                (context) => HomeScreen(
+                  nombreRestaurante: nombreRestaurante,
+                  tipoUsuario: tipoUsuario,
+                ),
           ),
         );
-      } 
-      else {
+      } else {
         throw Exception('No tienes permisos para acceder a este restaurante');
       }
-
     } on FirebaseAuthException catch (e) {
       _mostrarMensaje('Error de autenticación: ${e.message}');
     } catch (e) {
@@ -114,12 +139,10 @@ Future<void> _login() async {
       setState(() => _isLoading = false);
     }
   }
+
   void _mostrarMensaje(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensaje),
-        duration: Duration(seconds: 3),
-      ),
+      SnackBar(content: Text(mensaje), duration: Duration(seconds: 3)),
     );
   }
 
@@ -183,7 +206,11 @@ Future<void> _login() async {
                 ),
                 child: Column(
                   children: [
-                    _buildTextField(_emailController, "Correo electrónico", Icons.email),
+                    _buildTextField(
+                      _emailController,
+                      "Correo electrónico",
+                      Icons.email,
+                    ),
                     SizedBox(height: 15),
                     _buildTextField(
                       _passwordController,
@@ -192,7 +219,11 @@ Future<void> _login() async {
                       obscureText: true,
                     ),
                     SizedBox(height: 15),
-                    _buildTextField(_restauranteController, "Restaurante", Icons.restaurant),
+                    _buildTextField(
+                      _restauranteController,
+                      "Restaurante",
+                      Icons.restaurant,
+                    ),
                     SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -238,16 +269,17 @@ Future<void> _login() async {
                             borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                        child: _isLoading
-                            ? CircularProgressIndicator(color: Colors.white)
-                            : Text(
-                                "INICIAR SESIÓN",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                        child:
+                            _isLoading
+                                ? CircularProgressIndicator(color: Colors.white)
+                                : Text(
+                                  "INICIAR SESIÓN",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
                       ),
                     ),
                   ],
@@ -260,9 +292,7 @@ Future<void> _login() async {
           if (_isLoading)
             Container(
               color: Colors.black.withOpacity(0.5),
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: Center(child: CircularProgressIndicator()),
             ),
         ],
       ),
