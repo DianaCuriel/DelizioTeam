@@ -23,7 +23,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  String categoriaSeleccionada = 'Pendiente';
 
   @override
   void initState() {
@@ -86,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final pedidos = Provider.of<PedidoProvider>(
       context,
-    ).pedidosPorEstado(categoriaSeleccionada);
+    ).pedidosPorEstado('Pendiente');
 
     return Scaffold(
       appBar: AppBar(
@@ -144,41 +143,11 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
+            const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Row(
-                children: [
-                  const Text(
-                    'Pedidos ',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  DropdownButton<String>(
-                    value: categoriaSeleccionada,
-                    onChanged: (valor) {
-                      setState(() {
-                        categoriaSeleccionada = valor!;
-                      });
-                    },
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'Pendiente',
-                        child: Text('Pendientes'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'En proceso',
-                        child: Text('En proceso'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Listo',
-                        child: Text('Listo para entregar'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Entregado',
-                        child: Text('Entregados'),
-                      ),
-                    ],
-                  ),
-                ],
+              child: Text(
+                'Solicitudes pendientes',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
             Expanded(
@@ -199,15 +168,15 @@ class _HomeScreenState extends State<HomeScreen> {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(LucideIcons.home),
-            label: "Inicio",
+            label: 'Inicio',
           ),
           BottomNavigationBarItem(
             icon: Icon(LucideIcons.messageCircle),
-            label: "Chat",
+            label: 'Chat',
           ),
           BottomNavigationBarItem(
             icon: Icon(LucideIcons.shoppingBag),
-            label: "Pedidos",
+            label: 'Pedidos',
           ),
         ],
       ),
@@ -228,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Center(
                 child: Text(
-                  'Pedido #${pedido.id.substring(0, 8)}',
+                  'Pedido de ${pedido.nombreCliente}',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -236,7 +205,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+
               const SizedBox(height: 10),
+
+              // 👤 Información del cliente en 2 columnas
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -244,8 +216,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Producto: ${pedido.nombreplatillo}'),
-                        Text('Cantidad: ${pedido.cantidad}'),
+                        Text('Cliente: ${pedido.nombreCliente}'),
+                        Text('Cubiertos: ${pedido.cantidad}'),
                       ],
                     ),
                   ),
@@ -261,11 +233,63 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
+
               const SizedBox(height: 16),
-              if (pedido.mensaje.isNotEmpty) ...[
-                Text('Mensaje: ${pedido.mensaje}'),
-                const SizedBox(height: 16),
-              ],
+
+              // 🍽️ Información del platillo
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    // Imagen del platillo
+                    (pedido.imagen?.isNotEmpty == true)
+                        ? ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.asset(
+                            pedido.imagen!,
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                        : const Icon(
+                          Icons.image_not_supported,
+                          size: 60,
+                          color: Colors.grey,
+                        ),
+                    const SizedBox(width: 12),
+
+                    // Detalles del platillo
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            pedido.nombreplatillo,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text('Cantidad: ${pedido.cantidad}'),
+                          Text('Salsas: ${pedido.salsas}'),
+                          Text(
+                            'Descripción: ${pedido.descripcion}',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
               if (pedido.estado == 'Pendiente') ...[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -278,7 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ).eliminarPedido(pedido.id);
                       },
                       icon: const Icon(Icons.cancel),
-                      label: const Text("Rechazar"),
+                      label: const Text('Rechazar'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey,
                         foregroundColor: Colors.white,
@@ -293,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ).cambiarEstado(pedido.id, 'En proceso');
                       },
                       icon: const Icon(Icons.check),
-                      label: const Text("Aceptar"),
+                      label: const Text('Aceptar'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.lightBlueAccent,
                         foregroundColor: Colors.white,

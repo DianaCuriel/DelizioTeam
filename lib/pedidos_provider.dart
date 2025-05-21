@@ -10,20 +10,25 @@ class PedidoProvider with ChangeNotifier {
 
   Future<void> cargarPedidosPorNegocio(String nombreRestaurante) async {
     _nombreRestaurante = nombreRestaurante;
-    final snapshot = await FirebaseFirestore.instance
-        .collection('compras')
-        .where('NEGOCIO', isEqualTo: nombreRestaurante)
-        .get();
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('compras')
+            .where('negocio', isEqualTo: nombreRestaurante)
+            .get();
 
     _pedidos = await _procesarPedidos(snapshot.docs);
     notifyListeners();
   }
 
-  Future<List<Pedido>> _procesarPedidos(List<QueryDocumentSnapshot> docs) async {
+  Future<List<Pedido>> _procesarPedidos(
+    List<QueryDocumentSnapshot> docs,
+  ) async {
     List<Pedido> pedidos = [];
     for (var doc in docs) {
       final data = doc.data() as Map<String, dynamic>;
-      pedidos.add(Pedido.fromMap(doc.id, data, 'Cliente')); // Nombre temporal
+      pedidos.add(
+        Pedido.fromMap(doc.id, data, data['nombre_cliente'] ?? 'Sin nombre'),
+      );
     }
     return pedidos;
   }
@@ -31,7 +36,7 @@ class PedidoProvider with ChangeNotifier {
   Stream<List<Pedido>> escucharPedidosPorNegocio(String nombreRestaurante) {
     return FirebaseFirestore.instance
         .collection('compras')
-        .where('NEGOCIO', isEqualTo: nombreRestaurante)
+        .where('negocio', isEqualTo: nombreRestaurante)
         .snapshots()
         .asyncMap((snapshot) => _procesarPedidos(snapshot.docs));
   }
@@ -41,11 +46,10 @@ class PedidoProvider with ChangeNotifier {
   }
 
   Future<void> cambiarEstado(String pedidoId, String nuevoEstado) async {
-    await FirebaseFirestore.instance
-        .collection('compras')
-        .doc(pedidoId)
-        .update({'estado': nuevoEstado});
-    
+    await FirebaseFirestore.instance.collection('compras').doc(pedidoId).update(
+      {'estado': nuevoEstado},
+    );
+
     final index = _pedidos.indexWhere((p) => p.id == pedidoId);
     if (index != -1) {
       _pedidos[index] = _pedidos[index].copyWith(estado: nuevoEstado);
@@ -54,16 +58,17 @@ class PedidoProvider with ChangeNotifier {
   }
 
   Future<void> eliminarPedido(String pedidoId) async {
-    await FirebaseFirestore.instance.collection('compras').doc(pedidoId).delete();
+    await FirebaseFirestore.instance
+        .collection('compras')
+        .doc(pedidoId)
+        .delete();
     _pedidos.removeWhere((pedido) => pedido.id == pedidoId);
     notifyListeners();
   }
 }
 
 extension PedidoCopyWith on Pedido {
-  Pedido copyWith({
-    String? estado,
-  }) {
+  Pedido copyWith({String? estado}) {
     return Pedido(
       id: id,
       nombreCliente: nombreCliente,

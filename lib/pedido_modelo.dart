@@ -42,20 +42,24 @@ class Pedido {
     Map<String, dynamic> data,
     String nombreCliente,
   ) {
+    final productos = data['productos'] as List<dynamic>? ?? [];
+    final primerProducto =
+        productos.isNotEmpty ? productos[0] as Map<String, dynamic> : {};
+
     return Pedido(
       id: id,
       nombreCliente: nombreCliente,
-      productos: data['productos'] ?? [],
+      productos: productos,
       mensaje: data['mensaje'] ?? '',
       direccion: data['direccion'] ?? '',
       estado: data['estado'] ?? 'Pendiente',
       metodoPago: data['metodo_pago'] ?? 'efectivo',
       total: (data['subtotal'] ?? 0).toDouble(),
       cubiertos: data['cubiertos'] ?? false,
-      cantidad: data['cantidad'] ?? 1,
-      nombreplatillo: data['nombre'] ?? 'Producto',
-      precioUnitario: (data['precio_unitario'] ?? 0).toDouble(),
-      subtotal: (data['subtotal'] ?? 0).toDouble(),
+      cantidad: primerProducto['cantidad'] ?? 1,
+      nombreplatillo: primerProducto['nombre'] ?? 'Producto',
+      precioUnitario: (primerProducto['precio_unitario'] ?? 0).toDouble(),
+      subtotal: (primerProducto['subtotal'] ?? 0).toDouble(),
     );
   }
 }
