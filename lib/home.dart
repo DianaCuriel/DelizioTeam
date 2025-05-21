@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -23,16 +25,42 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  late Timer _timer; // Timer para actualizaciones periódicas
 
   @override
   void initState() {
     super.initState();
+    _cargarPedidosIniciales();
+    _iniciarActualizacionAutomatica();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel(); // Cancelar el timer cuando el widget se destruya
+    super.dispose();
+  }
+
+  void _cargarPedidosIniciales() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final pedidoProvider = Provider.of<PedidoProvider>(
         context,
         listen: false,
       );
       pedidoProvider.cargarPedidosPorNegocio(widget.nombreRestaurante);
+    });
+  }
+
+  void _iniciarActualizacionAutomatica() {
+    // Configurar un timer que se ejecute cada 10 segundos (ajusta este valor según necesites)
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      if (mounted) {
+        // Verificar que el widget todavía esté montado
+        final pedidoProvider = Provider.of<PedidoProvider>(
+          context,
+          listen: false,
+        );
+        pedidoProvider.cargarPedidosPorNegocio(widget.nombreRestaurante);
+      }
     });
   }
 
@@ -154,7 +182,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-
             Expanded(
               child:
                   pedidos.isEmpty
@@ -243,10 +270,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 10),
-
-              // 👤 Información del cliente en 2 columnas
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -254,11 +278,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Text('Tipo de envío: ${pedido.tipoEnvio}'),
                         Text('Tipo de envío: ${pedido.nombreCliente}'),
-                        // Text(
-                        //   'Domicilio: ${pedido.tipoEnvio == "Recoger en tienda" ? "No aplica" : pedido.domicilio}',
-                        // ),
                         Text(
                           'Domicilio: ${pedido.nombreCliente == "Recoger en tienda" ? "No aplica" : pedido.nombreCliente}',
                         ),
@@ -280,10 +300,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 16),
-
-              // 🍽️ Información del platillo
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
@@ -293,8 +310,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Row(
                   children: [
                     const SizedBox(width: 12),
-
-                    // Detalles del platillo
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -319,7 +334,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 16),
               if (pedido.estado == 'Pendiente') ...[
                 Row(
