@@ -54,7 +54,7 @@ class Pedido {
       direccion: data['direccion'] ?? '',
       estado: data['estado'] ?? 'Pendiente',
       metodoPago: data['metodo_pago'] ?? 'efectivo',
-      total: (data['subtotal'] ?? 0).toDouble(),
+      total: (data['total'] ?? 0).toDouble(),
       cubiertos: data['cubiertos'] ?? false,
       cantidad: primerProducto['cantidad'] ?? 1,
       nombreplatillo: primerProducto['nombre'] ?? 'Producto',

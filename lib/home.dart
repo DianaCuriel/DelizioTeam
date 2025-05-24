@@ -25,7 +25,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  late Timer _timer; // Timer para actualizaciones periódicas
+  late Timer _timer;
 
   @override
   void initState() {
@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    _timer.cancel(); // Cancelar el timer cuando el widget se destruya
+    _timer.cancel();
     super.dispose();
   }
 
@@ -51,10 +51,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _iniciarActualizacionAutomatica() {
-    // Configurar un timer que se ejecute cada 10 segundos (ajusta este valor según necesites)
     _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
       if (mounted) {
-        // Verificar que el widget todavía esté montado
         final pedidoProvider = Provider.of<PedidoProvider>(
           context,
           listen: false,
@@ -121,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
         leading: Builder(
           builder:
               (context) => IconButton(
-                icon: Icon(LucideIcons.menu),
+                icon: const Icon(LucideIcons.menu),
                 onPressed: () {
                   Scaffold.of(context).openDrawer();
                 },
@@ -178,44 +176,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.lightBlue, // Azul claro
+                  color: Colors.lightBlue,
                 ),
               ),
             ),
             Expanded(
               child:
                   pedidos.isEmpty
-                      ? Center(
-                        child: Container(
-                          margin: const EdgeInsets.all(32),
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.2),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Icon(Icons.inbox, size: 72, color: Colors.grey),
-                              SizedBox(height: 16),
-                              Text(
-                                'No hay pedidos en esta categoría',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black54,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
+                      ? _buildEmptyState()
                       : ListView.builder(
                         itemCount: pedidos.length,
                         itemBuilder: (context, index) {
@@ -248,7 +216,43 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildEmptyState() {
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.inbox, size: 72, color: Colors.grey),
+            SizedBox(height: 16),
+            Text(
+              'No hay pedidos en esta categoría',
+              style: TextStyle(fontSize: 16, color: Colors.black54),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildPedidoCard(BuildContext context, {required Pedido pedido}) {
+    final tieneDireccion =
+        pedido.direccion != null && pedido.direccion!.isNotEmpty;
+    final esRecogerEnTienda =
+        !tieneDireccion || pedido.direccion!.toLowerCase().contains('recoger');
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
@@ -262,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Center(
                 child: Text(
-                  'Pedido de ${pedido.nombreCliente}',
+                  'PEDIDO DE ${pedido.nombreCliente.toUpperCase()}',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -278,13 +282,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Tipo de envío: ${pedido.nombreCliente}'),
                         Text(
-                          'Domicilio: ${pedido.nombreCliente == "Recoger en tienda" ? "No aplica" : pedido.nombreCliente}',
+                          'Tipo de envío: ${esRecogerEnTienda ? "RECOGER EN TIENDA" : "DOMICILIO"}',
                         ),
-                        Text(
-                          'Cubiertos: ${pedido.cubiertos == 1 ? "Sí" : "No"}',
-                        ),
+                        if (!esRecogerEnTienda && tieneDireccion)
+                          Text('Dirección: ${pedido.direccion}'),
+                        Text('Cubiertos: ${pedido.cubiertos ? "SÍ" : "NO"}'),
                       ],
                     ),
                   ),
@@ -293,99 +296,158 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Total: \$${pedido.subtotal.toStringAsFixed(2)}'),
-                        Text('Pago: ${pedido.metodoPago}'),
+                        Text('Total: \$${pedido.total.toStringAsFixed(2)}'),
+                        Text('Pago: ${pedido.metodoPago.toUpperCase()}'),
                       ],
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            pedido.nombreplatillo,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text('Cantidad: ${pedido.cantidad}'),
-                          Text('Salsas: ${pedido.salsas}'),
-                          Text(
-                            'Descripción: ${pedido.descripcion}',
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              if (pedido.estado == 'Pendiente') ...[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Provider.of<PedidoProvider>(
-                          context,
-                          listen: false,
-                        ).eliminarPedido(pedido.id);
-                      },
-                      icon: const Icon(Icons.cancel),
-                      label: const Text('Cancelar'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red.shade200,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Provider.of<PedidoProvider>(
-                          context,
-                          listen: false,
-                        ).cambiarEstado(pedido.id, 'En proceso');
-                      },
-                      icon: const Icon(Icons.check),
-                      label: const Text('Confirmar pedido'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.lightBlueAccent,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ] else ...[
-                Center(
+              ..._buildListaProductos(pedido),
+              if (pedido.descripcion != null && pedido.descripcion!.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
                   child: Text(
-                    'Estado: ${pedido.estado}',
+                    'NOTA: ${pedido.descripcion}',
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: _getEstadoColor(pedido.estado),
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey[700],
                     ),
                   ),
                 ),
-              ],
+              const SizedBox(height: 16),
+              _buildBotonesEstado(pedido),
             ],
           ),
         ),
       ),
     );
+  }
+
+  List<Widget> _buildListaProductos(Pedido pedido) {
+    if (pedido.productos != null && pedido.productos!.isNotEmpty) {
+      return pedido.productos!.map<Widget>((producto) {
+        final prod = producto as Map<String, dynamic>;
+        return Container(
+          padding: const EdgeInsets.all(10),
+          margin: const EdgeInsets.only(bottom: 8),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      prod['nombre'] ?? 'Producto sin nombre',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text('Cantidad: ${prod['cantidad'] ?? 1}'),
+                    if (prod['precio_unitario'] != null)
+                      Text(
+                        'Precio: \$${prod['precio_unitario'].toStringAsFixed(2)}',
+                      ),
+                    if (prod['salsas'] != null &&
+                        (prod['salsas'] as List).isNotEmpty)
+                      Text('Salsas: ${(prod['salsas'] as List).join(", ")}'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList();
+    } else {
+      // Compatibilidad con el segundo formato de pedido (un solo producto)
+      return [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      pedido.nombreplatillo ?? 'Producto sin nombre',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text('Cantidad: ${pedido.cantidad ?? 1}'),
+                    if (pedido.salsas != null && pedido.salsas!.isNotEmpty)
+                      Text('Salsas: ${pedido.salsas}'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ];
+    }
+  }
+
+  Widget _buildBotonesEstado(Pedido pedido) {
+    if (pedido.estado == 'Pendiente') {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton.icon(
+            onPressed: () {
+              Provider.of<PedidoProvider>(
+                context,
+                listen: false,
+              ).eliminarPedido(pedido.id);
+            },
+            icon: const Icon(Icons.cancel),
+            label: const Text('CANCELAR'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade200,
+              foregroundColor: Colors.white,
+            ),
+          ),
+          const SizedBox(width: 12),
+          ElevatedButton.icon(
+            onPressed: () {
+              Provider.of<PedidoProvider>(
+                context,
+                listen: false,
+              ).cambiarEstado(pedido.id, 'En proceso');
+            },
+            icon: const Icon(Icons.check),
+            label: const Text('CONFIRMAR PEDIDO'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.lightBlueAccent,
+              foregroundColor: Colors.white,
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Center(
+        child: Text(
+          'ESTADO: ${pedido.estado.toUpperCase()}',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: _getEstadoColor(pedido.estado),
+          ),
+        ),
+      );
+    }
   }
 
   Color _getEstadoColor(String estado) {

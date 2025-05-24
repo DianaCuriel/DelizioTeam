@@ -26,9 +26,26 @@ class PedidoProvider with ChangeNotifier {
     List<Pedido> pedidos = [];
     for (var doc in docs) {
       final data = doc.data() as Map<String, dynamic>;
-      pedidos.add(
-        Pedido.fromMap(doc.id, data, data['nombre_cliente'] ?? 'Sin nombre'),
-      );
+      final usuarioId = data['usuario_id'] ?? '';
+      String nombreCliente = 'Sin nombre';
+
+      // Obtener el nombre del usuario desde la colección usuarios
+      if (usuarioId.isNotEmpty) {
+        try {
+          final userDoc =
+              await FirebaseFirestore.instance
+                  .collection('USUARIOS')
+                  .doc(usuarioId)
+                  .get();
+          if (userDoc.exists) {
+            nombreCliente = userDoc.data()?['NOMBRE'] ?? 'Sin nombre';
+          }
+        } catch (e) {
+          print('Error al obtener nombre de usuario: $e');
+        }
+      }
+
+      pedidos.add(Pedido.fromMap(doc.id, data, nombreCliente));
     }
     return pedidos;
   }
