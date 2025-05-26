@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+// import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'pedido_modelo.dart';
 import 'pedidos_provider.dart';
@@ -124,10 +124,10 @@ class _RestaurantePedidosState extends State<RestaurantePedidos> {
                                   ),
                                 ),
                                 const SizedBox(height: 10),
-                                Text(
-                                  'Fecha: ${DateFormat('dd/MM/yyyy HH:mm').format(pedido.fecha)}',
-                                  style: const TextStyle(color: Colors.grey),
-                                ),
+                                // Text(
+                                //   'Fecha: ${DateFormat('dd/MM/yyyy HH:mm').format(pedido.fecha)}',
+                                //   style: const TextStyle(color: Colors.grey),
+                                // ),
                                 const SizedBox(height: 10),
                                 Row(
                                   mainAxisAlignment:

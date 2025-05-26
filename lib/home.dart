@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+// import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'login.dart';
@@ -270,10 +270,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              Text(
-                'Fecha: ${DateFormat('dd/MM/yyyy HH:mm').format(pedido.fecha)}',
-                style: const TextStyle(color: Colors.grey),
-              ),
+              // Text(
+              //   'Fecha: ${DateFormat('dd/MM/yyyy HH:mm').format(pedido.fecha)}',
+              //   style: const TextStyle(color: Colors.grey),
+              // ),
               const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
