@@ -150,151 +150,172 @@ class LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          // FONDO CON OLA
-          ClipPath(
-            clipper: WaveClipper(),
-            child: Container(
-              height: MediaQuery.of(context).size.height * 0.80,
-              color: Colors.grey[200],
-            ),
-          ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Stack(
+            children: [
+              // FONDO CON OLA
+              ClipPath(
+                clipper: WaveClipper(),
+                child: Container(
+                  height: MediaQuery.of(context).size.height * 0.80,
+                  color: Colors.grey[200],
+                ),
+              ),
 
-          // LOGO Y TÍTULOS
-          Positioned(
-            top: 80,
-            left: 0,
-            right: 0,
-            child: Column(
-              children: [
-                Image.asset('lib/Config/Imagenes/Logo.png', height: 100),
-                SizedBox(height: 10),
-                Text(
-                  "DELIZIO",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.lightBlueAccent,
-                  ),
-                ),
-                Text(
-                  "APP PARA RESTAURANTES",
-                  style: TextStyle(fontSize: 16, color: Colors.lightBlueAccent),
-                ),
-              ],
-            ),
-          ),
-
-          // FORMULARIO
-          Align(
-            alignment: Alignment(0, 0.6),
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 50),
-              child: Container(
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      spreadRadius: 3,
-                    ),
-                  ],
-                ),
+              // LOGO Y TÍTULOS
+              Padding(
+                padding: const EdgeInsets.only(top: 80),
                 child: Column(
                   children: [
-                    _buildTextField(
-                      _emailController,
-                      "Correo electrónico",
-                      Icons.email,
-                    ),
-                    SizedBox(height: 15),
-                    _buildTextField(
-                      _passwordController,
-                      "Contraseña",
-                      Icons.lock,
-                      obscureText: true,
-                    ),
-                    SizedBox(height: 15),
-                    _buildTextField(
-                      _restauranteController,
-                      "Restaurante",
-                      Icons.restaurant,
-                    ),
+                    Image.asset('lib/Config/Imagenes/Logo.png', height: 100),
                     SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Checkbox(
-                              value: _rememberMe,
-                              onChanged: (value) {
-                                setState(() {
-                                  _rememberMe = value!;
-                                });
-                              },
-                            ),
-                            Text("Recuérdame"),
-                          ],
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const OlvidarContra(),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            "¿Olvidaste tu contraseña?",
-                            style: TextStyle(color: Colors.blue),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : _login,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          padding: EdgeInsets.symmetric(vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        child:
-                            _isLoading
-                                ? CircularProgressIndicator(color: Colors.white)
-                                : Text(
-                                  "INICIAR SESIÓN",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                    Text(
+                      "DELIZIO",
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.lightBlueAccent,
                       ),
                     ),
+                    Text(
+                      "APP PARA RESTAURANTES",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.lightBlueAccent,
+                      ),
+                    ),
+                    SizedBox(height: 40), // espacio antes del formulario
+                    // FORMULARIO
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: 500,
+                          ), // más ancho
+                          child: Container(
+                            padding: EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 10,
+                                  spreadRadius: 3,
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                _buildTextField(
+                                  _emailController,
+                                  "Correo electrónico",
+                                  Icons.email,
+                                ),
+                                SizedBox(height: 15),
+                                _buildTextField(
+                                  _passwordController,
+                                  "Contraseña",
+                                  Icons.lock,
+                                  obscureText: true,
+                                ),
+                                SizedBox(height: 15),
+                                _buildTextField(
+                                  _restauranteController,
+                                  "Restaurante",
+                                  Icons.restaurant,
+                                ),
+                                SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Checkbox(
+                                          value: _rememberMe,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _rememberMe = value!;
+                                            });
+                                          },
+                                        ),
+                                        Text("Recuérdame"),
+                                      ],
+                                    ),
+                                    Flexible(
+                                      child: TextButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) =>
+                                                      const OlvidarContra(),
+                                            ),
+                                          );
+                                        },
+                                        child: Text(
+                                          "¿Olvidaste tu contraseña?",
+                                          style: TextStyle(color: Colors.blue),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 20),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: _isLoading ? null : _login,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.black,
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 15,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                    ),
+                                    child:
+                                        _isLoading
+                                            ? CircularProgressIndicator(
+                                              color: Colors.white,
+                                            )
+                                            : Text(
+                                              "INICIAR SESIÓN",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: 50), // espacio final por si hay teclado
                   ],
                 ),
               ),
-            ),
-          ),
 
-          // OVERLAY DE CARGA
-          if (_isLoading)
-            Container(
-              color: Colors.black.withOpacity(0.5),
-              child: Center(child: CircularProgressIndicator()),
-            ),
-        ],
+              // OVERLAY DE CARGA
+              if (_isLoading)
+                Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

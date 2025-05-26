@@ -462,7 +462,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ).cambiarEstado(pedido.id, 'En proceso');
             },
             icon: const Icon(Icons.check),
-            label: const Text('CONFIRMAR PEDIDO'),
+            label: const Text('Confirmar'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.lightBlueAccent,
               foregroundColor: Colors.white,

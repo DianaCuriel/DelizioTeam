@@ -77,27 +77,32 @@ class _RestaurantePedidosState extends State<RestaurantePedidos> {
             child:
                 pedidos.isEmpty
                     ? Center(
-                      child: Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        margin: const EdgeInsets.symmetric(horizontal: 32),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            Icon(Icons.inbox, size: 80, color: Colors.grey),
-                            SizedBox(height: 16),
-                            Text(
-                              'No hay pedidos en esta categoría',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.grey,
+                      child: SingleChildScrollView(
+                        child: Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 24,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Icon(Icons.inbox, size: 80, color: Colors.grey),
+                              SizedBox(height: 16),
+                              Text(
+                                'No hay pedidos en esta categoría',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.grey,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     )
@@ -307,7 +312,7 @@ class _RestaurantePedidosState extends State<RestaurantePedidos> {
                                         icon: const Icon(Icons.check),
                                         label: Text(
                                           pedido.estado == 'Pendiente'
-                                              ? 'Confirmar pedido'
+                                              ? 'Confirmar'
                                               : pedido.estado == 'En proceso'
                                               ? 'Pago realizado'
                                               : 'Entregado',
