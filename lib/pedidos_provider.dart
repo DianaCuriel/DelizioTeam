@@ -29,7 +29,7 @@ class PedidoProvider with ChangeNotifier {
       final usuarioId = data['usuario_id'] ?? '';
       String nombreCliente = 'Sin nombre';
 
-      // Obtener el nombre del usuario desde la colección usuarios
+      // Obtener el nombre del usuario desde la colección USUARIOS
       if (usuarioId.isNotEmpty) {
         try {
           final userDoc =
@@ -88,18 +88,25 @@ extension PedidoCopyWith on Pedido {
   Pedido copyWith({String? estado}) {
     return Pedido(
       id: id,
+      clienteId: clienteId,
       nombreCliente: nombreCliente,
       productos: productos,
       mensaje: mensaje,
       direccion: direccion,
       estado: estado ?? this.estado,
       metodoPago: metodoPago,
+      formaEntrega: formaEntrega,
       total: total,
       cubiertos: cubiertos,
+      descripcion: descripcion,
+      imagen: imagen,
       cantidad: cantidad,
+      salsas: salsas,
+      extras: extras,
       nombreplatillo: nombreplatillo,
       precioUnitario: precioUnitario,
       subtotal: subtotal,
+      fecha: fecha,
     );
   }
 }

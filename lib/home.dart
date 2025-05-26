@@ -1,6 +1,6 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'login.dart';
@@ -248,11 +248,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildPedidoCard(BuildContext context, {required Pedido pedido}) {
-    final tieneDireccion =
-        pedido.direccion != null && pedido.direccion!.isNotEmpty;
-    final esRecogerEnTienda =
-        !tieneDireccion || pedido.direccion!.toLowerCase().contains('recoger');
-
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
@@ -275,6 +270,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 10),
+              Text(
+                'Fecha: ${DateFormat('dd/MM/yyyy HH:mm').format(pedido.fecha)}',
+                style: const TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -282,10 +282,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Tipo de envío: ${esRecogerEnTienda ? "RECOGER EN TIENDA" : "DOMICILIO"}',
-                        ),
-                        if (!esRecogerEnTienda && tieneDireccion)
+                        Text('Tipo: ${pedido.formaEntrega.toUpperCase()}'),
+                        if (pedido.formaEntrega == 'domicilio')
                           Text('Dirección: ${pedido.direccion}'),
                         Text('Cubiertos: ${pedido.cubiertos ? "SÍ" : "NO"}'),
                       ],
@@ -304,18 +302,53 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              ..._buildListaProductos(pedido),
-              if (pedido.descripcion != null && pedido.descripcion!.isNotEmpty)
+              if (pedido.mensaje.isNotEmpty)
                 Padding(
-                  padding: const EdgeInsets.only(top: 8),
+                  padding: const EdgeInsets.only(bottom: 8.0),
                   child: Text(
-                    'NOTA: ${pedido.descripcion}',
+                    'NOTA: ${pedido.mensaje}',
                     style: TextStyle(
                       fontStyle: FontStyle.italic,
                       color: Colors.grey[700],
                     ),
                   ),
                 ),
+              ...pedido.productos.map<Widget>((producto) {
+                final prod = producto as Map<String, dynamic>;
+                return Container(
+                  padding: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.only(bottom: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        prod['nombre'] ?? 'Producto sin nombre',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text('Cantidad: ${prod['cantidad'] ?? 1}'),
+                      Text(
+                        'Precio: \$${(prod['precio_unitario'] ?? 0).toStringAsFixed(2)}',
+                      ),
+                      Text(
+                        'Subtotal: \$${(prod['subtotal'] ?? 0).toStringAsFixed(2)}',
+                      ),
+                      if (prod['salsas'] != null &&
+                          (prod['salsas'] as List).isNotEmpty)
+                        Text('Salsas: ${(prod['salsas'] as List).join(", ")}'),
+                      if (prod['extras'] != null &&
+                          (prod['extras'] as List).isNotEmpty)
+                        Text('Extras: ${(prod['extras'] as List).join(", ")}'),
+                    ],
+                  ),
+                );
+              }).toList(),
               const SizedBox(height: 16),
               _buildBotonesEstado(pedido),
             ],

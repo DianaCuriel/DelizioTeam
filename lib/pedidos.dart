@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'pedido_modelo.dart';
 import 'pedidos_provider.dart';
@@ -123,6 +124,11 @@ class _RestaurantePedidosState extends State<RestaurantePedidos> {
                                   ),
                                 ),
                                 const SizedBox(height: 10),
+                                Text(
+                                  'Fecha: ${DateFormat('dd/MM/yyyy HH:mm').format(pedido.fecha)}',
+                                  style: const TextStyle(color: Colors.grey),
+                                ),
+                                const SizedBox(height: 10),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -133,13 +139,13 @@ class _RestaurantePedidosState extends State<RestaurantePedidos> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Tipo de envío: ${pedido.nombreCliente}',
+                                            'Tipo de envío: ${pedido.formaEntrega}',
                                           ),
                                           Text(
-                                            'Domicilio: ${pedido.nombreCliente == "Recoger en tienda" ? "No aplica" : pedido.nombreCliente}',
+                                            'Dirección: ${pedido.direccion}',
                                           ),
                                           Text(
-                                            'Cubiertos: ${pedido.cubiertos == 1 ? "Sí" : "No"}',
+                                            'Cubiertos: ${pedido.cubiertos ? "Sí" : "No"}',
                                           ),
                                         ],
                                       ),
@@ -151,7 +157,7 @@ class _RestaurantePedidosState extends State<RestaurantePedidos> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Total: \$${pedido.subtotal.toStringAsFixed(2)}',
+                                            'Total: \$${pedido.total.toStringAsFixed(2)}',
                                           ),
                                           Text('Pago: ${pedido.metodoPago}'),
                                         ],
@@ -159,6 +165,62 @@ class _RestaurantePedidosState extends State<RestaurantePedidos> {
                                     ),
                                   ],
                                 ),
+                                const SizedBox(height: 16),
+                                if (pedido.mensaje.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 8.0),
+                                    child: Text(
+                                      'Mensaje: ${pedido.mensaje}',
+                                      style: TextStyle(
+                                        fontStyle: FontStyle.italic,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                  ),
+                                ...pedido.productos.map<Widget>((producto) {
+                                  final prod = producto as Map<String, dynamic>;
+                                  return Container(
+                                    padding: const EdgeInsets.all(10),
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade100,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          prod['nombre'] ??
+                                              'Producto sin nombre',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Cantidad: ${prod['cantidad'] ?? 1}',
+                                        ),
+                                        Text(
+                                          'Precio unitario: \$${(prod['precio_unitario'] ?? 0).toStringAsFixed(2)}',
+                                        ),
+                                        Text(
+                                          'Subtotal: \$${(prod['subtotal'] ?? 0).toStringAsFixed(2)}',
+                                        ),
+                                        if (prod['salsas'] != null &&
+                                            (prod['salsas'] as List).isNotEmpty)
+                                          Text(
+                                            'Salsas: ${(prod['salsas'] as List).join(", ")}',
+                                          ),
+                                        if (prod['extras'] != null &&
+                                            (prod['extras'] as List).isNotEmpty)
+                                          Text(
+                                            'Extras: ${(prod['extras'] as List).join(", ")}',
+                                          ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
                                 const SizedBox(height: 16),
                                 Container(
                                   padding: const EdgeInsets.all(10),
